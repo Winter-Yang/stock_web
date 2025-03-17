@@ -90,9 +90,10 @@ async function fetchLimitUpStocksDaily() {
 async function fetchLimitUpStocks(year, month,day) {
     try {
         const myDay = year + '-' + month + '-' + day;
+        console.log("111111");
         console.log(myDay)
         // https://flash-api.xuangubao.com.cn/api/pool/detail?pool_name=limit_up&date=2025-03-13
-        const response = await fetch('https://flash-api.xuangubao.com.cn/api/pool/detail?pool_name=limit_up'+"&date="+myDay);
+        const response = await fetch('https://flash-api.xuangubao.com.cn/api/pool/detail?pool_name=limit_up');
         const data = await response.json();
         console.log('获取涨停池数据:', data);
         return data.data
