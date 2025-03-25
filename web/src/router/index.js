@@ -35,6 +35,11 @@ export const constantRoutes = [
         path: '/HotBlockList',
         name: 'HotBlockList',
         component: () => import('../components/page/HotBlockList.vue')
+      },
+      {
+        path: '/BlockRankPage',
+        name: 'BlockRankPage',
+        component: () => import('../components/page/BlockRankPage.vue')
       }
     ]
   },

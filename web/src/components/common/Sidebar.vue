@@ -86,11 +86,11 @@ export default {
         index: "InvestmentCalendar",
         title: "投资日历",
       }
-      // ,{
-      //   icon: "Message",
-      //   index: "HotBlockList",
-      //   title: "热门板块",
-      // }
+      ,{
+        icon: "Message",
+        index: "BlockRankPage",
+        title: "热门板块",
+      }
     ]);
 
     const onRoutes = computed(() => {
