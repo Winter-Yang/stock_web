@@ -67,7 +67,7 @@ class BlockRankResponse {
 // 获取板块排行数据
 async function fetchBlockRank() {
     try {
-        const response = await fetch('http://localhost:8233/get_bankuai_lists', {
+        const response = await fetch('http://152.136.147.208:8233/get_bankuai_lists', {
             method: 'POST'
         });
         
