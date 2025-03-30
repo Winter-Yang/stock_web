@@ -28,7 +28,7 @@
               <div class="block-name" :class="{'continuous-up': isTopRankBlock(scope.row[date].name)}">
                 {{ scope.row[date].name }}
               </div>
-              <div class="block-price" :class="{'up-percent': scope.row[date].price > 0}">
+              <div class="block-price" :class="{'up-percent': scope.row[date].price > 5000}">
                 {{ scope.row[date].price }}
               </div>
             </template>
@@ -191,12 +191,14 @@ export default {
 
 .block-price {
   font-size: 12px;
-  /* color: #f56c6c; */
+  /* color: #dd0e0e; */
 }
 
 .up-percent {
-  color: #f56c6c;
+  /* color: #f56c6c; */
   font-weight: 500;
+  color: #dd0e0e;
+
 }
 
 .down-percent {
@@ -205,7 +207,6 @@ export default {
 }
 
 :deep(.el-table th) {
-  background-color: #f5f7fa;
   /* color: #606266; */
   font-weight: 500;
   font-size: 13px;
@@ -228,12 +229,10 @@ export default {
   background-color: transparent !important;
 }
 
-:deep(.el-table__row:nth-child(odd)) {
-  background-color: #fdf5f5 !important;
-}
+
 
 .continuous-up {
-  color: #f56c6c !important;
+  color: red !important;
   font-weight: bold;
 }
 

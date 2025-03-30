@@ -3,9 +3,14 @@ const https = require('https');
 const cors = require('cors');
 const path = require('path');
 const { exec } = require('child_process');
+const fileUpload = require('express-fileupload');
+const fs = require('fs');
 
 const app = express();
 app.use(cors());
+app.use(express.json()); // 解析 JSON 格式的请求体
+app.use(express.urlencoded({ extended: true })); // 解析 URL 编码格式的请求体
+app.use(fileUpload()); // 处理文件上传
 //start app 
 const port = process.env.PORT || 8233;
 
@@ -76,3 +81,41 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname,'web','YHybrid', 'index.html'));
 });
 
+
+app.post('/file/upload', async (req, res) => {
+  try {
+    console.log('file upload');
+        // 处理文件上传
+    const file = req.files.file;
+
+    // 检查路径
+    const filePath = req.files.path ? req.files.path.data.toString() : null;
+    const targetDir = path.join(__dirname, "static","uploads");
+    const toPath = filePath ? path.join(targetDir, filePath) : targetDir;
+
+    // 确保目标目录存在
+    if (!fs.existsSync(toPath)) {
+      fs.mkdirSync(toPath, { recursive: true });
+    }
+
+    console.log(`Moving file to: ${toPath}/${file.name}`);
+    
+    // 移动文件到目标位置
+    file.mv(path.join(toPath, file.name), (err) => {
+      if (err) {
+        console.log('file upload error');
+        return res.status(500).json({ errCode: '-1',errMsg: err.message,data:{} });
+      }
+      console.log('file upload success');
+      res.status(200).json({ errCode: '0',errMsg: '',data:{} });
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ errCode: '-1',errMsg: err.message,data:{} });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
