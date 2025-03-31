@@ -4,6 +4,8 @@ import akshare as ak
 import pandas as pd
 from datetime import datetime, date
 import json
+import os
+
 def getTradeDates():
     """获取最近的交易日"""
     current_date = date.today()
@@ -11,11 +13,24 @@ def getTradeDates():
     current_position = df[df['trade_date'] <= current_date].index[-1]
     historical_dates = df['trade_date'].loc[:current_position][-10:].values
     date_strings = [date.strftime('%Y-%m-%d') for date in historical_dates]
-    print(list(reversed(date_strings)) )
     return list(reversed(date_strings))
 
 def fetch_block_rank(date:str,today:bool):
     """获取板块排行数据,直接返回板块列表"""
+     # 设置缓存目录
+    cache_dir = os.path.join(os.path.dirname(__file__), 'cache')
+    if not os.path.exists(cache_dir):
+        os.makedirs(cache_dir)
+    cache_file = os.path.join(cache_dir, f"{date}.txt")
+    # 如果存在缓存文件且不是今天的数据，直接读取缓存
+    if os.path.exists(cache_file) and not today:
+        try:
+            print(f'{date}使用缓存数据')
+            with open(cache_file, 'r', encoding='utf-8') as f:
+                return json.loads(f.read())
+        except Exception as e:
+            pass
+
     try:
         params = {
             'Index': '0',
@@ -68,10 +83,18 @@ def fetch_block_rank(date:str,today:bool):
                 # 'last_price': float(item[17]), # 最新价
                 # 'last_zdf': float(item[18])    # 最新涨跌幅
             })
+
+
+        if not today:  # 只缓存历史数据
+            try:
+                with open(cache_file, 'w', encoding='utf-8') as f:
+                    json.dump(block_list, f, ensure_ascii=False, indent=2)
+            except Exception as e:
+                pass
         return block_list
             
     except Exception as e:
-        print('获取板块排行数据失败:', str(e))
+        pass
         return []
 
 # 使用示例
