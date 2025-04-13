@@ -18,6 +18,7 @@
     "@guolao/vue-monaco-editor": "^1.5.4",
     "@monaco-editor/loader": "^1.4.0",
     "axios": "^1.8.3",
+    "echarts": "^5.6.0",
     "element-plus": "^2.8.1",
     "express-fileupload": "^1.5.1",
     "express-sse": "^0.5.3",

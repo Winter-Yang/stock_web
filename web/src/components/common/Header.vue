@@ -5,7 +5,7 @@
             <i v-if="!collapse"><el-icon size="24px"><Fold /></el-icon></i>
             <i v-else><el-icon size="24px"><Expand /></el-icon></i>
         </div>
-        <div class="logo">每日情绪</div>
+        <div class="logo">市场情绪追踪</div>
         <div class="spacer"></div>
         <div class="header-right">
             

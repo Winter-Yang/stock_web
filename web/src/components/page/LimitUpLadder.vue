@@ -1,7 +1,7 @@
 <template>
   <div class="limit-up-ladder">
     <div class="ladder-header">
-      <div class="header-left">进度</div>
+      <div class="header-left">晋级</div>
       <div class="header-right">晋级率</div>
     </div>
     <div class="ladder-content">
@@ -11,13 +11,33 @@
           <div class="level-rate">{{ level.rate }}</div>
         </div>
         <div class="stock-list">
-          <div v-for="(stock, stockIndex) in level.stocks" :key="stockIndex" class="stock-item">
-            <span class="stock-area">{{ getStockArea(stock.symbol) }}</span>
-            <span class="stock-name" :class="getStockNameClass(stock)">{{ stock.stock_chi_name }}</span>
-            <span class="stock-change" :class="getChangeClass(stock.change_percent)">
-              {{ formatChange(stock.change_percent) }}
-            </span>
-            <span class="stock-tag">{{ getStockTag(stock) }}</span>
+          <div v-for="(stock, stockIndex) in level.stocks" 
+               :key="stockIndex" 
+               class="stock-item">
+            <el-popover
+            placement="auto"
+            trigger="hover"
+              :width="1100"
+              :height="400"
+              popper-class="stock-popover"
+            >
+              <template #default>
+                <div class="popover-content">
+                  <h3>{{ stock.stock_chi_name }} ({{ stock.symbol }})</h3>
+                  <StockKLineChart :stockCode="stock.symbol" />
+                </div>
+              </template>
+              <template #reference>
+                <div class="stock-content">
+                  <span class="stock-area">{{ getStockArea(stock.symbol) }}</span>
+                  <span class="stock-name" :class="getStockNameClass(stock)">{{ stock.stock_chi_name }}</span>
+                  <span class="stock-change" :class="getChangeClass(stock.change_percent)">
+                    {{ formatChange(stock.change_percent) }}
+                  </span>
+                  <span class="stock-tag">{{ getStockTag(stock) }}</span>
+                </div>
+              </template>
+            </el-popover>
           </div>
         </div>
       </div>
@@ -27,9 +47,13 @@
 
 <script>
 import { ref, onMounted } from 'vue'
+import StockKLineChart from '../chart/StockKLineChart.vue'
 import { LimitUpStock, fetchLimitUpStocksDaily, fetchYesterdayLimitUpStocks } from '../models/limitUpModel';
 export default {
   name: 'LimitUpLadder',
+  components: {
+    StockKLineChart
+  },
   setup() {
     const todayStocks = ref([])
     const yesterdayStocks = ref([])
@@ -164,7 +188,6 @@ export default {
       if (stock.yesterdayFailed) return 'success'
       return ''
     }
-
     return {
       ladderLevels,
       getStockArea,
@@ -293,5 +316,42 @@ export default {
 :deep(.el-table) {
   --el-table-border-color: #ebeef5;
   --el-table-header-bg-color: #f5f7fa;
+}
+
+.stock-popover {
+  padding: 16px;
+}
+
+.popover-content {
+  width: 100%;
+  height: 100%;
+}
+
+.popover-content h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #303133;
+}
+
+.stock-detail {
+  font-size: 14px;
+  color: #606266;
+}
+
+.stock-detail p {
+  margin: 8px 0;
+  line-height: 1.4;
+}
+
+.stock-content {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+:deep(.el-popover.stock-popover) {
+  min-width: 800px;
+  padding: 16px;
 }
 </style>
