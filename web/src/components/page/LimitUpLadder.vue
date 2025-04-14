@@ -15,10 +15,11 @@
                :key="stockIndex" 
                class="stock-item">
             <el-popover
-            placement="auto"
-            trigger="hover"
+              placement="auto"
+              trigger="hover"
               :width="1100"
               :height="400"
+              :hide-after=0
               popper-class="stock-popover"
             >
               <template #default>
