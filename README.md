@@ -42,7 +42,7 @@ node main.js
 ### 备注
 如果您有好的思路欢迎一起学习探讨，早日脱离苦海
 wx: Wade-Well
-邮箱: wendy.yang10091@gmail.com
+邮箱: wendy.yang1009@gmail.com
 
 
 
