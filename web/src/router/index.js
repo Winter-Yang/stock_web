@@ -40,6 +40,11 @@ export const constantRoutes = [
         path: '/BlockRankPage',
         name: 'BlockRankPage',
         component: () => import('../components/page/BlockRankPage.vue')
+      },
+      {
+        path: '/LimitUpKLine',
+        name: 'LimitUpKLine',
+        component: () => import('../components/page/LimitUpKLine.vue')
       }
     ]
   },

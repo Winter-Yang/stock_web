@@ -1,47 +1,68 @@
 ---
 name: deploy
-description: 将 Web 项目构建、提交到 Git 后，SSH 登录腾讯云服务器自动 git pull 并重启 PM2
+description: 一键部署 Web 项目到腾讯云服务器。触发词：部署、部署到腾讯云、部署到服务器、开始部署、发布、publish、deploy、上线
 license: MIT
 ---
 
 # 腾讯云部署 Skill
 
-## 功能
+## 触发词
 
-一键完成 Web 项目从本地到腾讯云服务器的部署流程：
-1. **本地构建**：执行 `vite build` 打包前端
-2. **提交推送**：`git add/commit/push` 到远程仓库
-3. **远程拉取**：SSH 到服务器执行 `git pull` 获取最新代码
-4. **远程构建**：在服务器上重新 `vite build`
-5. **重启服务**：`pm2 restart main` 重启 Express 服务
+当用户提到以下任一关键词时，执行部署流程：
+- 部署 / 部署到腾讯云 / 部署到服务器 / 开始部署
+- 发布 / 上线 / publish / deploy
+- 更新到线上 / 同步到服务器
 
-## 使用方法
+## 部署流程
 
-**前置配置**：复制 `.deploy.env.example` 为 `.deploy.env`，填入服务器 IP 等信息。
+### 步骤 1：确认配置
+检查 `.deploy.env` 是否存在且配置正确。
 
-**执行部署**：
+### 步骤 2：执行部署脚本
 ```bash
 ./deploy.sh
 ```
 
-## 环境变量
+脚本自动完成：
+1. **本地构建**：`vite build` 打包前端
+2. **Git 提交**：`git add/commit/push`
+3. **部署到服务器**（根据 `DEPLOY_MODE`）：
+   - `scp`（默认）：SCP 上传 `web/YHybrid` + `main.js`，然后 `pm2 restart`
+   - `git`：SSH 到服务器 `git pull` + `vite build` + `pm2 restart`
 
-| 变量 | 说明 | 默认值 |
-|------|------|--------|
-| `DEPLOY_HOST` | 腾讯云服务器 IP | 需手动填写 |
-| `DEPLOY_USER` | SSH 用户名 | `root` |
-| `DEPLOY_PORT` | SSH 端口 | `22` |
-
-## 服务器要求
-
-- 已配置 SSH 免密登录（推荐）
-- Node.js 已安装（当前服务器版本 v23.10.0）
-- PM2 已安装并运行 `main` 进程
-- 项目目录：`/root/ywd_program/stock/stock_web`
-
-## 快速部署（跳过配置）
-
-如果已配置 `.deploy.env`，直接运行：
+### 步骤 3：验证
+部署完成后验证关键页面：
 ```bash
-source .deploy.env && ./deploy.sh
+# 验证板块排行
+curl -s http://服务器IP:8233/BlockRankPage | grep -o 'id="app"'
+
+# 验证涨停梯队
+curl -s http://服务器IP:8233/LimitUpLadder | grep -o 'id="app"'
+
+# 验证 API 代理
+curl -s http://服务器IP:8233/api/10jqka/pick/block/... | python3 -m json.tool
 ```
+
+## 配置说明
+
+`.deploy.env` 文件：
+```
+DEPLOY_HOST=tencent-stock      # SSH Host（~/.ssh/config 中的 Host 名或服务器 IP）
+DEPLOY_USER=root               # SSH 用户名
+DEPLOY_PORT=22                 # SSH 端口
+DEPLOY_MODE=scp                # scp（直接传文件） 或 git（服务器 git pull）
+```
+
+## 故障排查
+
+### PM2 重启失败
+服务器上 PM2 路径可能变化，用完整路径：
+```
+/root/.nvm/nvm-0.39.1/versions/node/v23.10.0/bin/node /root/.nvm/npm-versions/lib/node_modules/pm2/bin/pm2 restart main
+```
+
+### API 代理 404
+说明 `main.js` 未同步到服务器，SCP 模式需要上传 `main.js`。
+
+### 端口问题
+Express 监听 `3000`，但外部域名可能通过 Nginx 反代到 `8233`，验证时用 `8233` 端口。

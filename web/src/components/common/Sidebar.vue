@@ -90,6 +90,11 @@ export default {
         icon: "Message",
         index: "BlockRankPage",
         title: "热门板块",
+      },
+      {
+        icon: "TrendCharts",
+        index: "LimitUpKLine",
+        title: "涨停K线",
       }
     ]);
 

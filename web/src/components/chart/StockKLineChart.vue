@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted,watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, getCurrentInstance } from 'vue'
 import * as echarts from 'echarts'
 import { fetchKLineData } from '../models/klineModel'
 
@@ -17,6 +17,7 @@ export default {
       required: false
     }
   },
+  emits: ['loaded'],
   setup(props) {
     const chartRef = ref(null)
     let chart = null
@@ -188,6 +189,10 @@ export default {
         }
 
         chart.setOption(option)
+
+        // 向父组件发送K线原始数据
+        const ctx = getCurrentInstance()
+        if (ctx) ctx.emit('loaded', klineData)
     }
 
     watch(() => props.stockCode, () => {
