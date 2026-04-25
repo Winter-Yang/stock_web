@@ -210,7 +210,7 @@ export default {
   background: #fff;
   border: 1px solid #ebeef5;
   border-radius: 6px;
-  padding: 8px 12px;
+  padding: 8px 12px 14px;
   transition: box-shadow 0.2s;
 }
 
@@ -277,10 +277,11 @@ export default {
 
 .kline-wrapper {
   width: 100%;
+  margin-bottom: 4px;
 }
 
 :deep(.k-line-chart) {
   width: 100% !important;
-  height: 280px !important;
+  height: 380px !important;
 }
 </style>
