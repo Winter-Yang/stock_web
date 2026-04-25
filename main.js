@@ -5,6 +5,13 @@ const path = require('path');
 const { exec } = require('child_process');
 const fileUpload = require('express-fileupload');
 const fs = require('fs');
+const httpProxy = require('http-proxy');
+
+const apiProxy = httpProxy.createProxyServer({
+  target: 'https://eq.10jqka.com.cn',
+  changeOrigin: true,
+  secure: false
+});
 
 const app = express();
 app.use(cors());
@@ -70,6 +77,12 @@ app.post('/get_bankuai_lists', async (req, res) => {
 
 
 
+
+app.use('/api/10jqka', (req, res) => {
+  req.headers['referer'] = 'https://eq.10jqka.com.cn/';
+  req.headers['origin'] = 'https://eq.10jqka.com.cn';
+  apiProxy.web(req, res);
+});
 
 // 处理其他所有路由，返回 index.html
 app.use(express.static(path.join(__dirname,'web', 'YHybrid')));

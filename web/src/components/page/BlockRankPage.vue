@@ -11,16 +11,29 @@
         :data="tableData"
         style="width: 100%"
         height="calc(100vh - 180px)"
-        :virtual-scrolling="true"
-        :row-height="54"
         border
+        :row-class-name="getRowClassName"
       >
+        <!-- 排名列 -->
+        <el-table-column
+          label="排名"
+          width="60"
+          align="center"
+          fixed="left"
+        >
+          <template #default="scope">
+            <span class="rank-badge" :class="getRankClass(scope.$index)">
+              {{ scope.$index + 1 }}
+            </span>
+          </template>
+        </el-table-column>
+
         <!-- 日期列 -->
-        <el-table-column 
-          v-for="date in dates" 
+        <el-table-column
+          v-for="date in dates"
           :key="date"
           :label="formatDate(date)"
-          min-width="100"
+          min-width="110"
           align="center"
         >
           <template #default="scope">
@@ -28,15 +41,11 @@
               <div class="block-name" :class="{'continuous-up': isTopRankBlock(scope.row[date].name)}">
                 {{ scope.row[date].name }}
               </div>
-              <div class="block-price" :class="{'up-percent': scope.row[date].price > 5000}">
-                {{ scope.row[date].price }}
-              </div>
+              <div class="block-change">+{{ scope.row[date].price }}%</div>
             </template>
-            <template v-else>-</template>
+            <template v-else class="empty-cell">-</template>
           </template>
         </el-table-column>
-        
-        
       </el-table>
     </el-card>
   </div>
@@ -52,18 +61,14 @@ export default {
     const rawData = ref({})
     const loading = ref(false)
 
-    // 获取所有日期
     const dates = computed(() => Object.keys(rawData.value))
 
-    // 处理数据为表格格式
     const tableData = computed(() => {
       const result = []
-      const maxRows = 20 // 显示前20行数据
+      const maxRows = 20
 
-      // 为每一行创建数据
       for (let i = 0; i < maxRows; i++) {
         const rowData = {}
-        // 填充每个日期的数据
         dates.value.forEach(date => {
           if (rawData.value[date] && rawData.value[date][i]) {
             rowData[date] = {
@@ -77,13 +82,11 @@ export default {
       return result
     })
 
-    // 格式化日期显示
     const formatDate = (dateStr) => {
       const date = new Date(dateStr)
       return `${date.getMonth() + 1}-${date.getDate()}`
     }
 
-    // 获取板块数据
     const loadBlockData = async () => {
       loading.value = true
       try {
@@ -102,40 +105,6 @@ export default {
       loadBlockData()
     })
 
-    // 判断是否连续三天排名增长或不变
-    const isContinuousUp = (row, currentDate) => {
-      const dateList = dates.value.sort().reverse() // 按日期倒序排列
-      const currentIndex = dateList.indexOf(currentDate)
-      
-      // 如果当前日期后面没有足够的历史数据，返回false
-      if (currentIndex > dateList.length - 3) return false
-      
-      // 获取连续三天的数据
-      const day1 = dateList[currentIndex]
-      const day2 = dateList[currentIndex + 1]
-      const day3 = dateList[currentIndex + 2]
-      
-      // 如果任何一天数据缺失，返回false
-      if (!row[day1] || !row[day2] || !row[day3]) return false
-      
-      // 获取三天的名称，用于比较是否是同一个板块
-      const name1 = row[day1].name
-      const name2 = row[day2].name
-      const name3 = row[day3].name
-      
-      // 首先确保是同一个板块
-      if (name1 !== name2 || name2 !== name3) return false
-      
-      // 获取三天的排名
-      const rank1 = rawData.value[day1].findIndex(item => item.name === name1)
-      const rank2 = rawData.value[day2].findIndex(item => item.name === name2)
-      const rank3 = rawData.value[day3].findIndex(item => item.name === name3)
-      
-      // 判断排名是否持平或上升（排名数字越小越好）
-      return rank1 <= rank2 && rank2 <= rank3
-    }
-
-    // 获取所有日期的第一名板块名称集合
     const getTopRankBlocks = computed(() => {
       const topBlocks = new Set()
       dates.value.forEach(date => {
@@ -146,9 +115,15 @@ export default {
       return topBlocks
     })
 
-    // 判断是否为第一名板块
     const isTopRankBlock = (blockName) => {
       return getTopRankBlocks.value.has(blockName)
+    }
+
+    const getRankClass = (index) => {
+      if (index === 0) return 'rank-1'
+      if (index === 1) return 'rank-2'
+      if (index === 2) return 'rank-3'
+      return ''
     }
 
     return {
@@ -156,7 +131,8 @@ export default {
       tableData,
       loading,
       formatDate,
-      isTopRankBlock  // 替换原来的 isContinuousUp
+      isTopRankBlock,
+      getRankClass
     }
   }
 }
@@ -184,59 +160,64 @@ export default {
   font-weight: 500;
 }
 
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #606266;
+  background-color: #f0f2f5;
+}
+
+.rank-badge.rank-1 {
+  color: #fff;
+  background-color: #f56c6c;
+}
+
+.rank-badge.rank-2 {
+  color: #fff;
+  background-color: #e6a23c;
+}
+
+.rank-badge.rank-3 {
+  color: #fff;
+  background-color: #f0a500;
+}
+
 .block-name {
   font-size: 14px;
   margin-bottom: 4px;
+  color: #303133;
 }
 
-.block-price {
-  font-size: 12px;
-  /* color: #dd0e0e; */
+.block-change {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f56c6c;
 }
 
-.up-percent {
-  /* color: #f56c6c; */
-  font-weight: 500;
-  color: #dd0e0e;
-
-}
-
-.down-percent {
-  color: #67c23a;
-  font-weight: 500;
+.continuous-up {
+  font-weight: 700;
 }
 
 :deep(.el-table th) {
-  /* color: #606266; */
   font-weight: 500;
   font-size: 13px;
 }
-
-:deep(.el-table__body-wrapper::-webkit-scrollbar) {
-  width: 8px;
-}
-/* 
-:deep(.el-table__body-wrapper::-webkit-scrollbar-thumb) {
-  background-color: #dcdfe6;
-  border-radius: 4px;
-}
-
-:deep(.el-table__body-wrapper::-webkit-scrollbar-track) {
-  background-color: #f5f7fa;
-} */
 
 :deep(.el-table__row) {
   background-color: transparent !important;
 }
 
-
-
-.continuous-up {
-  color: red !important;
-  font-weight: bold;
+:deep(.el-table__row:nth-child(even)) {
+  background-color: #fafbfc !important;
 }
 
-.block-name {
-  color: #333;
+:deep(.el-table td) {
+  padding: 10px 0;
 }
 </style>
