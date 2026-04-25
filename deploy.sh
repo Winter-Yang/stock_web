@@ -64,8 +64,9 @@ else
     echo "📤 [3/3] SCP 上传构建产物 + 重启 PM2..."
     ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "rm -rf $REMOTE_DIR/web/YHybrid"
     scp -P "$SSH_PORT" -r "$WEB_DIR/YHybrid" "$SSH_USER@$SSH_HOST:$REMOTE_DIR/web/"
-    # 同步 main.js（新增代理路由等）
+    # 同步 main.js 和 .env（token 等配置）
     scp -P "$SSH_PORT" "$(dirname "$0")/main.js" "$SSH_USER@$SSH_HOST:$REMOTE_DIR/"
+    scp -P "$SSH_PORT" "$WEB_DIR/.env" "$SSH_USER@$SSH_HOST:$REMOTE_DIR/web/"
     ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "$REMOTE_NODE $REMOTE_PM2 restart $PM2_NAME"
     echo "✅ 文件已上传，PM2 已重启"
 fi

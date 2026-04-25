@@ -49,7 +49,7 @@ var http = {
         // 'pragma': 'no-cache',
         // 'priority': 'u=1, i',
         'timestamp': Date.now().toString(),
-        'token': 'd05fead4baf3fea35f38c0503ec0685c',
+        'token': import.meta.env.VITE_API_TOKEN || '',
         "Access-Control-Allow-Origin":"*",
       };
     }
